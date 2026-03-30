@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>OMÜ Web Tek Lab - AJAX</title>
+   <style>
+    /* Genel Sayfa Düzeni */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px;
+        color: #333;
+    }
+
+    h2 {
+        color: #a02020; 
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #a02020;
+        padding-bottom: 10px;
+    }
+
+   
+    #ustBilgi {
+        width: 100%;
+        max-width: 500px;
+        min-height: 120px;
+        background: white;
+        border-left: 5px solid #a02020;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        line-height: 1.6;
+    }
+
+  
+    table {
+        width: 100%;
+        max-width: 600px;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    th {
+        background-color: #a02020;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    th, td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+   
+    .satir {
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .satir:hover {
+        background-color: #fff5f5;
+        transform: scale(1.01);
+    }
+
+    .satir:active {
+        background-color: #ffeaea;
+    }
+
+    /* Küçük Detaylar */
+    b { color: #a02020; }
+</style>
+</head>
+<body>
+
+    <h2>Ogrenciye Tiklandiginda Bilgilerin Ekrana Getirilmesi</h2>
+
+    <div id="ustBilgi"></div>
+
+    <table>
+        <tr>
+            <th>Numara</th>
+            <th>AdSoyad</th>
+        </tr>
+        <tr class="satir" onclick="bilgiGetir('111111')">
+            <td>111111</td>
+            <td>İlayda Akyıldız</td>
+        </tr>
+        <tr class="satir" onclick="bilgiGetir('222222')">
+            <td>222222</td>
+            <td>Ali Eren Özgen</td>
+        </tr>
+        <tr class="satir" onclick="bilgiGetir('333333')">
+            <td>333333</td>
+            <td>Gizem İspir</td>
+        </tr>
+    </table>
+
+    <script>
+    function bilgiGetir(tiklananNumara) {
+        // 1. XMLHttpRequest nesnesini oluştur [cite: 94, 191]
+        var xhttp = new XMLHttpRequest();
+
+        // 2. Sunucudan cevap geldiğinde ne yapılacağını tanımla [cite: 193, 249]
+        xhttp.onreadystatechange = function() {
+            // İşlem tamamlandı (4) ve sonuç başarılı (200) ise [cite: 195, 254, 257]
+            if (this.readyState == 4 && this.status == 200) {
+                
+                var xmlDoc = this.responseXML; // Gelen XML'i al [cite: 256]
+                var ogrenciler = xmlDoc.getElementsByTagName("ogrenci");
+                var sonucHtml = "";
+
+                // XML içinde döngü kur ve tıklanan numarayı bul
+                for (var i = 0; i < ogrenciler.length; i++) {
+                    var xmlNum = ogrenciler[i].getElementsByTagName("numara")[0].innerHTML;
+                    
+                    if (xmlNum == tiklananNumara) {
+                        var ad = ogrenciler[i].getElementsByTagName("adsoyad")[0].innerHTML;
+                        var bol = ogrenciler[i].getElementsByTagName("bolum")[0].innerHTML;
+                        var sin = ogrenciler[i].getElementsByTagName("sinif")[0].innerHTML;
+
+                        // Üst kısma yazılacak metni hazırla [cite: 260]
+                          sonucHtml = "<b>Numara:</b> " + xmlNum + "<br>" +
+                          "<b>Ad Soyad:</b> " + ad + "<br>" +
+                          "<b>Bölüm:</b> " + bol + "<br>" +
+                          "<b>Sınıfı:</b> " + sin;
+                        break; 
+                    }
+                }
+                // Hazırlanan metni ekrandaki div'e bas [cite: 197]
+                document.getElementById("ustBilgi").innerHTML = sonucHtml;
+            }
+        };
+
+        // 3. Dosyayı asenkron (true) olarak aç ve gönder [cite: 203, 205, 237]
+        xhttp.open("GET", "ogrenciler.xml", true);
+        xhttp.send();
+    }
+    </script>
+
+</body>
+</html>
